@@ -12,5 +12,5 @@ namespace Daikon\Interop;
 
 interface FromNativeInterface
 {
-    public function fromNative($payload);
+    public static function fromNative($payload);
 }
