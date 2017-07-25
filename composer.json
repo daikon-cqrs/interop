@@ -1,0 +1,17 @@
+
+{
+    "name": "daikon/interop",
+    "type": "library",
+    "description": "Interop interfaces used across daikon components.",
+    "keywords": [ ],
+    "homepage": "https://github.com/daikon-cqrs/interop",
+    "license": "MPL-2.0",
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.1"
+    },
+    "autoload": {
+        "psr-4": { "Daikon\\Interop\\" : "src" }
+    }
+}
