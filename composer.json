@@ -17,6 +17,12 @@
     "autoload": {
         "psr-4": { "Daikon\\Interop\\" : "src" }
     },
+    "archive": {
+        "exclude": [
+            "/build",
+            "/vendor"
+        ]
+    },
     "scripts": {
         "build": [ "@sniff" ],
         "code-sniffer": "phpcs -p -s --extensions=php --standard='PSR1,PSR2' src/",
