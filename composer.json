@@ -2,16 +2,32 @@
 {
     "name": "daikon/interop",
     "type": "library",
-    "description": "Interop interfaces used across daikon components.",
-    "keywords": [ ],
+    "description": "Interop interfaces used across Daikon components.",
     "homepage": "https://github.com/daikon-cqrs/interop",
     "license": "MPL-2.0",
     "prefer-stable": true,
     "minimum-stability": "dev",
     "require": {
-        "php": ">=7.1"
+        "php": "^7.2"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.3",
+        "sebastian/phpcpd": "^4.1"
     },
     "autoload": {
         "psr-4": { "Daikon\\Interop\\" : "src" }
+    },
+    "scripts": {
+        "build": [ "@sniff" ],
+        "code-sniffer": "phpcs -p -s --extensions=php --standard='PSR1,PSR2' src/",
+        "code-sniffer-autofix": "phpcbf --standard=PSR2 -d tabWidth=4 src/",
+        "copy-paste-detector": "phpcpd src/ || true",
+        "sniff": [
+            "@code-sniffer",
+            "@copy-paste-detector",
+            "@validate-json"
+        ],
+        "validate-deps": "composer validate --with-dependencies --strict",
+        "validate-json": "composer validate --no-check-all --no-check-lock"
     }
 }
