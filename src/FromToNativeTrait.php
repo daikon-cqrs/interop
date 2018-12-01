@@ -16,7 +16,7 @@ trait FromToNativeTrait
 {
     public static function fromNative($payload)
     {
-        if (is_array($payload)) {
+        if (!is_array($payload)) {
             throw new \RuntimeException("This trait only works for complex state (array based).");
         }
         $classReflection = new \ReflectionClass(static::class);
