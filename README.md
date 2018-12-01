@@ -1,3 +1,3 @@
-# interop
+# Interop
 
-Interop interfaces used across Daikon components.
+Interop traits used across Daikon components.
