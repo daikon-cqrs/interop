@@ -17,13 +17,15 @@ trait FromToNativeTrait
     public static function fromNative($payload)
     {
         if (!is_array($payload)) {
-            throw new \RuntimeException("This trait only works for complex state (array based).");
+            throw new \RuntimeException('This trait only works for complex state (array based).');
         }
         $classReflection = new \ReflectionClass(static::class);
         list($valueFactories, $sendable) = static::construct($classReflection, $payload);
         foreach ($valueFactories as $propName => $factory) {
             if (array_key_exists($propName, $payload)) {
                 $sendable->$propName = call_user_func($factory, $payload[$propName]);
+            } elseif (is_callable($emptyFactory = [$factory[0], 'makeEmpty'])) {
+                $sendable->$propName = call_user_func($emptyFactory);
             }
         }
         return $sendable;
@@ -41,8 +43,8 @@ trait FromToNativeTrait
                 }
                 $prop->setAccessible(true);
                 $value = $prop->getValue($this);
-                $toNative = [ $value, "toNative" ];
-                $toArray = [ $value, "toArray" ];
+                $toNative = [$value, 'toNative'];
+                $toArray = [$value, 'toArray'];
                 if (is_callable($toNative)) {
                     $data[$propName] = call_user_func($toNative);
                 } elseif (is_callable($toArray)) {
@@ -58,20 +60,20 @@ trait FromToNativeTrait
     private static function construct(\ReflectionClass $classReflection, array $payload): array
     {
         $valueFactories = self::inferValueFactories($classReflection);
-        if (!$classReflection->hasMethod("__construct")) {
+        if (!$classReflection->hasMethod('__construct')) {
             /** @psalm-suppress TooFewArguments */
-            return [ $valueFactories, new static ];
+            return [$valueFactories, new static];
         }
 
         $ctorArgs = [];
-        foreach ($classReflection->getMethod("__construct")->getParameters() as $argReflection) {
+        foreach ($classReflection->getMethod('__construct')->getParameters() as $argReflection) {
             $argName = $argReflection->getName();
             if (isset($payload[$argName])) {
                 if (isset($valueFactories[$argName])) {
                     $ctorArgs[] = call_user_func($valueFactories[$argName], $payload[$argName]);
                     unset($valueFactories[$argName]);
                 } else {
-                    // missing factory annoation, throw exception or ignore?
+                    // missing factory annotation, throw exception or ignore?
                 }
             } elseif ($argReflection->allowsNull()) {
                 $ctorArgs[] = null;
@@ -89,9 +91,9 @@ trait FromToNativeTrait
             if (!($docComment = $curClass->getDocComment())) {
                 continue;
             }
-            preg_match_all("~@map\(((.*)\,(.*))\)~", $curClass->getDocComment(), $matches);
+            preg_match_all('#@(?:id|rev|map)\(((.+),(.+))\)#', $docComment, $matches);
             foreach ($matches[2] as $idx => $propName) {
-                $callable = array_map("trim", explode("::", $matches[3][$idx]));
+                $callable = array_map('trim', explode('::', $matches[3][$idx]));
                 Assertion::isCallable($callable);
                 $valueFactories[$propName] = $callable;
             }
@@ -103,12 +105,12 @@ trait FromToNativeTrait
     {
         $parent = $classReflection;
         $classes = $includeTraits
-            ? array_merge([ $classReflection ], self::flatMapTraits($classReflection))
-            : [ $classReflection ];
+            ? array_merge([$classReflection], self::flatMapTraits($classReflection))
+            : [$classReflection];
         while ($parent = $parent->getParentClass()) {
             $classes = $includeTraits
-                ? array_merge($classes, [ $parent ], self::flatMapTraits($parent))
-                : array_merge($classes, [ $classReflection ]);
+                ? array_merge($classes, [$parent], self::flatMapTraits($parent))
+                : array_merge($classes, [$classReflection]);
         }
         return $classes;
     }
@@ -118,7 +120,7 @@ trait FromToNativeTrait
         $traits = [];
         $curTrait = $classReflection;
         foreach ($curTrait->getTraits() as $trait) {
-            $traits = array_merge($traits, [ $trait ], self::flatMapTraits($trait));
+            $traits = array_merge($traits, [$trait], self::flatMapTraits($trait));
         }
         return $traits;
     }
