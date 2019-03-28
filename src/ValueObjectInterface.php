@@ -12,7 +12,7 @@ namespace Daikon\Interop;
 
 interface ValueObjectInterface extends FromNativeInterface, ToNativeInterface
 {
-    public function equals(ValueObjectInterface $value): bool;
+    public function equals($value): bool;
 
     public function __toString(): string;
 }
