@@ -2,7 +2,7 @@
 {
     "name": "daikon/interop",
     "type": "library",
-    "description": "Interop traits used across Daikon components.",
+    "description": "Interop components used across Daikon components.",
     "homepage": "https://github.com/daikon-cqrs/interop",
     "license": "MPL-2.0",
     "prefer-stable": true,
