@@ -94,7 +94,7 @@ trait FromToNativeTrait
             preg_match_all('#@(?:id|rev|map)\(((.+),(.+))\)#', $docComment, $matches);
             foreach ($matches[2] as $idx => $propName) {
                 $callable = array_map('trim', explode('::', $matches[3][$idx]));
-                Assertion::isCallable($callable);
+                Assertion::isCallable($callable, "Value factory $callable[0] is not callable in ".static::class);
                 $valueFactories[$propName] = $callable;
             }
         }
