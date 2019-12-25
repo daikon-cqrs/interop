@@ -35,7 +35,7 @@ trait FromToNativeTrait
     {
         $data = [];
         $classReflection = new \ReflectionClass($this);
-        foreach (self::getInheritanceTree($classReflection, true) as $curClass) {
+        foreach (static::getInheritanceTree($classReflection, true) as $curClass) {
             foreach ($curClass->getProperties() as $prop) {
                 $propName = $prop->getName();
                 if ($curClass->isTrait()) {
@@ -59,7 +59,7 @@ trait FromToNativeTrait
 
     private static function construct(\ReflectionClass $classReflection, array $payload): array
     {
-        $valueFactories = self::inferValueFactories($classReflection);
+        $valueFactories = static::inferValueFactories($classReflection);
         if (!$classReflection->hasMethod('__construct')) {
             /** @psalm-suppress TooFewArguments */
             return [$valueFactories, new static];
@@ -87,7 +87,7 @@ trait FromToNativeTrait
     private static function inferValueFactories(\ReflectionClass $classReflection): array
     {
         $valueFactories = [];
-        foreach (self::getInheritanceTree($classReflection, true) as $curClass) {
+        foreach (static::getInheritanceTree($classReflection, true) as $curClass) {
             if (!($docComment = $curClass->getDocComment())) {
                 continue;
             }
@@ -105,11 +105,11 @@ trait FromToNativeTrait
     {
         $parent = $classReflection;
         $classes = $includeTraits
-            ? array_merge([$classReflection], self::flatMapTraits($classReflection))
+            ? array_merge([$classReflection], static::flatMapTraits($classReflection))
             : [$classReflection];
         while ($parent = $parent->getParentClass()) {
             $classes = $includeTraits
-                ? array_merge($classes, [$parent], self::flatMapTraits($parent))
+                ? array_merge($classes, [$parent], static::flatMapTraits($parent))
                 : array_merge($classes, [$classReflection]);
         }
         return $classes;
@@ -120,7 +120,7 @@ trait FromToNativeTrait
         $traits = [];
         $curTrait = $classReflection;
         foreach ($curTrait->getTraits() as $trait) {
-            $traits = array_merge($traits, [$trait], self::flatMapTraits($trait));
+            $traits = array_merge($traits, [$trait], static::flatMapTraits($trait));
         }
         return $traits;
     }
