@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the daikon-cqrs/interop project.
  *
@@ -6,11 +6,13 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Daikon\Interop;
 
 interface FromNativeInterface
 {
+    /**
+     * @param mixed $state
+     * @return mixed
+     */
     public static function fromNative($state);
 }

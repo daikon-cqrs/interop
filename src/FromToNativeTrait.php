@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the daikon-cqrs/interop project.
  *
@@ -6,20 +6,20 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Daikon\Interop;
 
 use Assert\Assertion;
+use ReflectionClass;
+use RuntimeException;
 
 trait FromToNativeTrait
 {
     public static function fromNative($payload)
     {
         if (!is_array($payload)) {
-            throw new \RuntimeException('This trait only works for complex state (array based).');
+            throw new RuntimeException('This trait only works for complex state (array based).');
         }
-        $classReflection = new \ReflectionClass(static::class);
+        $classReflection = new ReflectionClass(static::class);
         list($valueFactories, $sendable) = static::construct($classReflection, $payload);
         foreach ($valueFactories as $propName => $factory) {
             if (array_key_exists($propName, $payload)) {
@@ -34,7 +34,7 @@ trait FromToNativeTrait
     public function toNative(): array
     {
         $data = [];
-        $classReflection = new \ReflectionClass($this);
+        $classReflection = new ReflectionClass($this);
         foreach (static::getInheritanceTree($classReflection, true) as $curClass) {
             foreach ($curClass->getProperties() as $prop) {
                 $propName = $prop->getName();
@@ -57,7 +57,7 @@ trait FromToNativeTrait
         return $data;
     }
 
-    private static function construct(\ReflectionClass $classReflection, array $payload): array
+    private static function construct(ReflectionClass $classReflection, array $payload): array
     {
         $valueFactories = static::inferValueFactories($classReflection);
         if (!$classReflection->hasMethod('__construct')) {
@@ -78,13 +78,15 @@ trait FromToNativeTrait
             } elseif ($argReflection->allowsNull()) {
                 $ctorArgs[] = null;
             } else {
-                throw new \Exception("Missing required value for array-key: $argName while constructing from array");
+                throw new RuntimeException(
+                    "Missing required value for array-key: $argName while constructing from array"
+                );
             }
         }
         return [$valueFactories, new static(...$ctorArgs)];
     }
 
-    private static function inferValueFactories(\ReflectionClass $classReflection): array
+    private static function inferValueFactories(ReflectionClass $classReflection): array
     {
         $valueFactories = [];
         foreach (static::getInheritanceTree($classReflection, true) as $curClass) {
@@ -101,7 +103,7 @@ trait FromToNativeTrait
         return $valueFactories;
     }
 
-    private static function getInheritanceTree(\ReflectionClass $classReflection, bool $includeTraits = false): array
+    private static function getInheritanceTree(ReflectionClass $classReflection, bool $includeTraits = false): array
     {
         $parent = $classReflection;
         $classes = $includeTraits
@@ -115,7 +117,7 @@ trait FromToNativeTrait
         return $classes;
     }
 
-    private static function flatMapTraits(\ReflectionClass $classReflection): array
+    private static function flatMapTraits(ReflectionClass $classReflection): array
     {
         $traits = [];
         $curTrait = $classReflection;
