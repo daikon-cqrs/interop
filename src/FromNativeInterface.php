@@ -11,7 +11,7 @@ namespace Daikon\Interop;
 interface FromNativeInterface
 {
     /**
-     * @param mixed $state
+     * @psalm-suppress MissingParamType
      * @return mixed
      */
     public static function fromNative($state);
