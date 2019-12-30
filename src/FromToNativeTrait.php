@@ -8,98 +8,100 @@
 
 namespace Daikon\Interop;
 
-use Assert\Assertion;
 use ReflectionClass;
 use RuntimeException;
 
 trait FromToNativeTrait
 {
-    public static function fromNative($payload)
+    public static function fromNative($state)
     {
-        if (!is_array($payload)) {
-            throw new RuntimeException('This trait only works for complex state (array based).');
+        if (!is_array($state)) {
+            throw new RuntimeException('This trait only works with array state.');
         }
+
         $classReflection = new ReflectionClass(static::class);
-        list($valueFactories, $sendable) = static::construct($classReflection, $payload);
-        foreach ($valueFactories as $propName => $factory) {
-            if (array_key_exists($propName, $payload)) {
-                $sendable->$propName = call_user_func($factory, $payload[$propName]);
+        list($valueFactories, $product) = static::construct($classReflection, $state);
+        foreach ($valueFactories as $propertyName => $factory) {
+            if (array_key_exists($propertyName, $state)) {
+                $product->$propertyName = call_user_func($factory, $state[$propertyName]);
             } elseif (is_callable($emptyFactory = [$factory[0], 'makeEmpty'])) {
-                $sendable->$propName = call_user_func($emptyFactory);
+                $product->$propertyName = call_user_func($emptyFactory);
             }
         }
-        return $sendable;
+        return $product;
     }
 
     public function toNative(): array
     {
-        $data = [];
+        $state = [];
         $classReflection = new ReflectionClass($this);
-        foreach (static::getInheritanceTree($classReflection, true) as $curClass) {
-            foreach ($curClass->getProperties() as $prop) {
-                $propName = $prop->getName();
-                if ($curClass->isTrait()) {
-                    $prop = $classReflection->getProperty($propName);
+        foreach (static::getInheritanceTree($classReflection, true) as $currentClass) {
+            foreach ($currentClass->getProperties() as $property) {
+                $propertyName = $property->getName();
+                if ($currentClass->isTrait()) {
+                    $property = $classReflection->getProperty($propertyName);
                 }
-                $prop->setAccessible(true);
-                $value = $prop->getValue($this);
-                $toNative = [$value, 'toNative'];
-                $toArray = [$value, 'toArray'];
-                if (is_callable($toNative)) {
-                    $data[$propName] = call_user_func($toNative);
-                } elseif (is_callable($toArray)) {
-                    $data[$propName] = call_user_func($toArray);
+                $property->setAccessible(true);
+                $value = $property->getValue($this);
+                if (is_callable($nativeFactory = [$value, 'toNative'])) {
+                    $state[$propertyName] = call_user_func($nativeFactory);
                 } else {
-                    $data[$propName] = $value;
+                    $state[$propertyName] = $value;
                 }
             }
         }
-        return $data;
+
+        return $state;
     }
 
     private static function construct(ReflectionClass $classReflection, array $payload): array
     {
         $valueFactories = static::inferValueFactories($classReflection);
         if (!$classReflection->hasMethod('__construct')) {
-            /** @psalm-suppress TooFewArguments */
             return [$valueFactories, new static];
         }
 
-        $ctorArgs = [];
-        foreach ($classReflection->getMethod('__construct')->getParameters() as $argReflection) {
-            $argName = $argReflection->getName();
-            if (isset($payload[$argName])) {
-                if (isset($valueFactories[$argName])) {
-                    $ctorArgs[] = call_user_func($valueFactories[$argName], $payload[$argName]);
-                    unset($valueFactories[$argName]);
+        $constructorArgs = [];
+        $constructorParams = $classReflection->getMethod('__construct')->getParameters();
+        foreach ($constructorParams as $constructorParam) {
+            $paramName = $constructorParam->getName();
+            if (isset($payload[$paramName])) {
+                if (isset($valueFactories[$paramName])) {
+                    $constructorArgs[] = call_user_func($valueFactories[$paramName], $payload[$paramName]);
+                    unset($valueFactories[$paramName]);
                 } else {
-                    // missing factory annotation, throw exception or ignore?
+                    $constructorArgs[] = $payload[$paramName];
                 }
-            } elseif ($argReflection->allowsNull()) {
-                $ctorArgs[] = null;
+            } elseif ($constructorParam->allowsNull()) {
+                $constructorArgs[] = null;
             } else {
                 throw new RuntimeException(
-                    "Missing required value for array-key: $argName while constructing from array"
+                    "Missing required value for key '$paramName' while constructing from native state."
                 );
             }
         }
-        return [$valueFactories, new static(...$ctorArgs)];
+
+        return [$valueFactories, new static(...$constructorArgs)];
     }
 
     private static function inferValueFactories(ReflectionClass $classReflection): array
     {
         $valueFactories = [];
-        foreach (static::getInheritanceTree($classReflection, true) as $curClass) {
-            if (!($docComment = $curClass->getDocComment())) {
+        foreach (static::getInheritanceTree($classReflection, true) as $currentClass) {
+            if (!($docComment = $currentClass->getDocComment())) {
                 continue;
             }
             preg_match_all('#@(?:id|rev|map)\(((.+),(.+))\)#', $docComment, $matches);
-            foreach ($matches[2] as $idx => $propName) {
-                $callable = array_map('trim', explode('::', $matches[3][$idx]));
-                Assertion::isCallable($callable, "Value factory $callable[0] is not callable in ".static::class);
-                $valueFactories[$propName] = $callable;
+            //@todo don't allow duplicate id/rev
+            foreach ($matches[2] as $index => $propertyName) {
+                $callable = array_map('trim', explode('::', $matches[3][$index]));
+                if (!is_callable($callable)) {
+                    throw new RuntimeException("Value factory '$callable[0]' is not callable in ".static::class);
+                }
+                $valueFactories[$propertyName] = $callable;
             }
         }
+
         return $valueFactories;
     }
 
@@ -109,21 +111,24 @@ trait FromToNativeTrait
         $classes = $includeTraits
             ? array_merge([$classReflection], static::flatMapTraits($classReflection))
             : [$classReflection];
+
         while ($parent = $parent->getParentClass()) {
             $classes = $includeTraits
                 ? array_merge($classes, [$parent], static::flatMapTraits($parent))
                 : array_merge($classes, [$classReflection]);
         }
+
         return $classes;
     }
 
     private static function flatMapTraits(ReflectionClass $classReflection): array
     {
         $traits = [];
-        $curTrait = $classReflection;
-        foreach ($curTrait->getTraits() as $trait) {
+        $currentTrait = $classReflection;
+        foreach ($currentTrait->getTraits() as $trait) {
             $traits = array_merge($traits, [$trait], static::flatMapTraits($trait));
         }
+
         return $traits;
     }
 }
