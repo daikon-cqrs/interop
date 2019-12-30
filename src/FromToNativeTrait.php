@@ -28,6 +28,7 @@ trait FromToNativeTrait
                 $product->$propertyName = call_user_func($emptyFactory);
             }
         }
+
         return $product;
     }
 
