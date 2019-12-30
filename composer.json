@@ -17,10 +17,10 @@
         "vimeo/psalm": "^3.0"
     },
     "autoload": {
-        "psr-4": {
-            "Daikon\\Interop\\" : "src",
-            "Daikon\\Tests\\Interop\\": "tests"
-        }
+        "psr-4": { "Daikon\\Interop\\" : "src" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Daikon\\Tests\\Interop\\" : "tests" }
     },
     "archive": {
         "exclude": [
@@ -29,16 +29,18 @@
         ]
     },
     "scripts": {
-        "build": [ "@sniff" ],
-        "code-sniffer": "phpcs -p -s --extensions=php --standard='PSR1,PSR2' src",
-        "code-sniffer-autofix": "phpcbf --standard=PSR2 -d tabWidth=4 src",
-        "copy-paste-detector": "phpcpd src || true",
+        "build": [ "@sniff", "@tests" ],
+        "code-sniffer": "phpcs -p -s --extensions=php --standard='PSR1,PSR2' src tests",
+        "code-sniffer-autofix": "phpcbf --standard=PSR2 -d tabWidth=4 src tests",
+        "copy-paste-detector": "phpcpd src tests || true",
         "sniff": [
             "@code-sniffer",
             "@copy-paste-detector",
             "@validate-json",
             "psalm"
         ],
+        "test": "phpunit --no-coverage",
+        "tests": "phpunit",
         "validate-deps": "composer validate --with-dependencies --strict",
         "validate-json": "composer validate --no-check-all --no-check-lock"
     }
