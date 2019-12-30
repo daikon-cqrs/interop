@@ -6,14 +6,15 @@
  * file that was distributed with this source code.
  */
 
- namespace Daikon\Tests\Interop;
+namespace Daikon\Tests\Interop;
 
- use PHPUnit\Framework\TestCase as FrameworkTestCase;
+use PHPUnit\Framework\TestCase as FrameworkTestCase;
 
- abstract class TestCase extends FrameworkTestCase
- {
-    public function __construct()
+abstract class TestCase extends FrameworkTestCase
+{
+    public function __construct($name = null, array $data = [], $dataName = '')
     {
         $this->backupGlobals = true;
+        parent::__construct($name, $data, $dataName);
     }
- }
+}
