@@ -13,10 +13,10 @@ use RuntimeException;
 
 trait FromToNativeTrait
 {
-    public static function fromNative($state)
+    public static function fromNative($state): object
     {
         if (!is_array($state)) {
-            throw new RuntimeException('This trait only works with array state.');
+            throw new RuntimeException('This trait only works with array state');
         }
 
         $classReflection = new ReflectionClass(static::class);
@@ -59,6 +59,7 @@ trait FromToNativeTrait
     {
         $valueFactories = static::inferValueFactories($classReflection);
         if (!$classReflection->hasMethod('__construct')) {
+            /** @psalm-suppress TooFewArguments */
             return [$valueFactories, new static];
         }
 
@@ -77,7 +78,7 @@ trait FromToNativeTrait
                 $constructorArgs[] = null;
             } else {
                 throw new RuntimeException(
-                    "Missing required value for key '$paramName' while constructing from native state."
+                    "Missing required value for key '$paramName' while constructing from native state"
                 );
             }
         }
