@@ -13,6 +13,7 @@ use RuntimeException;
 
 trait FromToNativeTrait
 {
+    /** @psalm-suppress MissingParamType */
     public static function fromNative($state): object
     {
         if (!is_array($state)) {
@@ -83,6 +84,7 @@ trait FromToNativeTrait
             }
         }
 
+        /** @psalm-suppress TooManyArguments */
         return [$valueFactories, new static(...$constructorArgs)];
     }
 
