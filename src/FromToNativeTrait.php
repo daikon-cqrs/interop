@@ -83,11 +83,8 @@ trait FromToNativeTrait
             }
         }
 
-        /**
-         * @psalm-suppress TooManyArguments
-         * @scrutinizer ignore-call
-         */
-        return [$valueFactories, new static(...$constructorArgs)];
+        /** @psalm-suppress TooManyArguments */
+        return [$valueFactories, /** @scrutinizer ignore-call */ new static(...$constructorArgs)];
     }
 
     private static function inferValueFactories(ReflectionClass $classReflection): array

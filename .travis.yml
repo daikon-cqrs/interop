@@ -10,22 +10,20 @@ env:
   global:
     CC_TEST_REPORTER_ID=4eaa0d717a3e692efa1a754918561ef6a305adc9733e45ed29f6a20e07c27e65
 
-before_install:
+install:
   - curl -s http://getcomposer.org/installer | php -- --filename=composer
   - chmod +x composer
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > cc-test-reporter
   - chmod +x cc-test-reporter
-  - wget https://scrutinizer-ci.com/ocular.phar
-
-install:
-  - composer install --dev --no-interaction
+  - wget -q https://scrutinizer-ci.com/ocular.phar
+  - composer install --no-interaction
 
 before_script:
-  - cc-test-reporter before-build
+  - ./cc-test-reporter before-build
 
 script:
   - composer build
 
 after_script:
   - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
-  - cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
