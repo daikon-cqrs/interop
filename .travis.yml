@@ -3,17 +3,29 @@ language: php
 php:
   - 7.4
 
+os: linux
 dist: bionic
-sudo: false
 
-install:
+env:
+  global:
+    CC_TEST_REPORTER_ID=4eaa0d717a3e692efa1a754918561ef6a305adc9733e45ed29f6a20e07c27e65
+
+before_install:
   - curl -s http://getcomposer.org/installer | php -- --filename=composer
   - chmod +x composer
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > cc-test-reporter
+  - chmod +x cc-test-reporter
+  - wget https://scrutinizer-ci.com/ocular.phar
+
+install:
   - composer install --dev --no-interaction
-  - wget -q https://github.com/php-coveralls/php-coveralls/releases/latest/download/php-coveralls.phar
+
+before_script:
+  - cc-test-reporter before-build
 
 script:
   - composer build
 
-after_success:
-  - travis_retry php php-coveralls.phar -v
+after_script:
+  - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
+  - cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

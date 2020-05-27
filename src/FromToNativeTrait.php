@@ -9,7 +9,6 @@
 namespace Daikon\Interop;
 
 use ReflectionClass;
-use RuntimeException;
 
 trait FromToNativeTrait
 {
@@ -17,7 +16,7 @@ trait FromToNativeTrait
     public static function fromNative($state): object
     {
         if (!is_array($state)) {
-            throw new RuntimeException('This trait only works with array state');
+            throw new RuntimeException('This trait only works with array state.');
         }
 
         $classReflection = new ReflectionClass(static::class);
@@ -79,12 +78,15 @@ trait FromToNativeTrait
                 $constructorArgs[] = null;
             } else {
                 throw new RuntimeException(
-                    "Missing required value for key '$paramName' while constructing from native state"
+                    "Missing required value for key '$paramName' while constructing from native state."
                 );
             }
         }
 
-        /** @psalm-suppress TooManyArguments */
+        /**
+         * @psalm-suppress TooManyArguments
+         * @scrutinizer ignore-call
+         */
         return [$valueFactories, new static(...$constructorArgs)];
     }
 

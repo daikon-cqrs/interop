@@ -1,7 +1,7 @@
 {
     "name": "daikon/interop",
     "type": "library",
-    "description": "Interop components used across Daikon components.",
+    "description": "Interoperability code used across Daikon-CQRS components.",
     "homepage": "https://github.com/daikon-cqrs/interop",
     "license": "MPL-2.0",
     "prefer-stable": true,
@@ -32,7 +32,7 @@
         "code-sniffer": "phpcs -p -s --extensions=php --standard='PSR1,PSR2' src tests",
         "code-sniffer-autofix": "phpcbf --standard=PSR2 -d tabWidth=4 src tests",
         "copy-paste-detector": "phpcpd src tests || true",
-        "psalm": "psalm --show-info=true",
+        "psalm": "psalm --shepherd --show-info=true",
         "sniff": [
             "@code-sniffer",
             "@copy-paste-detector",
