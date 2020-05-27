@@ -1,0 +1,19 @@
+language: php
+
+php:
+  - 7.4
+
+dist: bionic
+sudo: false
+
+install:
+  - curl -s http://getcomposer.org/installer | php -- --filename=composer
+  - chmod +x composer
+  - composer install --dev --no-interaction
+  - wget -q https://github.com/php-coveralls/php-coveralls/releases/latest/download/php-coveralls.phar
+
+script:
+  - composer build
+
+after_success:
+  - travis_retry php php-coveralls.phar -v
