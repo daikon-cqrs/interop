@@ -13,29 +13,30 @@ use Daikon\Interop\FromToNativeTrait;
 use Daikon\Interop\MakeEmptyInterface;
 use Daikon\Interop\ToNativeInterface;
 
-final class MockValue implements FromNativeInterface, ToNativeInterface, MakeEmptyInterface
+/**
+ * @map(mockValue, Daikon\Tests\Interop\Fixture\MockValue::fromNative)
+ * @map(otherMockValue, Daikon\Tests\Interop\Fixture\MockValue::customFactory)
+ */
+final class AnnotatedValue implements FromNativeInterface, ToNativeInterface, MakeEmptyInterface
 {
     use FromToNativeTrait;
 
-    private ?string $value;
+    private ?MockValue $mockValue;
+
+    private MockValue $otherMockValue;
 
     public static function makeEmpty(): self
     {
         return new self;
     }
 
-    public static function customFactory(array $state): self
+    public function getMockValue(): MockValue
     {
-        return new self($state['custom']);
+        return $this->mockValue ?? MockValue::makeEmpty();
     }
 
-    public function getValue(): ?string
+    public function getOtherMockValue(): MockValue
     {
-        return $this->value;
-    }
-
-    private function __construct(string $value = null)
-    {
-        $this->value = $value;
+        return $this->otherMockValue;
     }
 }

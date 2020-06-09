@@ -99,7 +99,10 @@ trait FromToNativeTrait
             //@todo don't allow duplicate id/rev
             foreach ($matches[2] as $index => $propertyName) {
                 $callable = array_map('trim', explode('::', $matches[3][$index]));
-                Assertion::isCallable($callable, "Value factory '$callable[0]' is not callable in ".static::class);
+                Assertion::isCallable(
+                    $callable,
+                    sprintf("Value factory '%s' is not callable in '%s'.", implode('::', $callable), static::class)
+                );
                 $valueFactories[$propertyName] = $callable;
             }
         }
