@@ -8,6 +8,6 @@
 
 namespace Daikon\Interop;
 
-class LazyAssertionException extends AssertionFailedException
+class AssertionFailedException extends InvalidArgumentException
 {
 }

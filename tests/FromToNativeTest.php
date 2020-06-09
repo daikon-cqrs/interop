@@ -8,7 +8,7 @@
 
 namespace Daikon\Tests\Interop;
 
-use Daikon\Interop\InvalidArgumentException;
+use Daikon\Interop\AssertionFailedException;
 use Daikon\Tests\Interop\Fixture\MockValue;
 use PHPUnit\Framework\TestCase;
 use TypeError;
@@ -23,13 +23,13 @@ class FromToNativeTest extends TestCase
 
     public function testFromNativeWithNull(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(AssertionFailedException::class);
         MockValue::fromNative(null);
     }
 
     public function testFromNativeWithScalar(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(AssertionFailedException::class);
         MockValue::fromNative('test');
     }
 
