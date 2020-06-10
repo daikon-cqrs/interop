@@ -8,8 +8,18 @@
 
 namespace Daikon\Interop;
 
-use InvalidArgumentException as GlobalInvalidArgumentException;
+use Assert\InvalidArgumentException as BaseInvalidArgumentException;
 
-class InvalidArgumentException extends GlobalInvalidArgumentException implements DaikonException
+class InvalidArgumentException extends BaseInvalidArgumentException implements DaikonException
 {
+    /** @param mixed $value */
+    public function __construct(
+        string $message = '',
+        int $code = 0,
+        string $propertyPath = null,
+        $value = null,
+        array $constraints = []
+    ) {
+        parent::__construct($message, $code, $propertyPath, $value, $constraints);
+    }
 }

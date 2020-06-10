@@ -9,23 +9,22 @@
 namespace Daikon\Interop;
 
 use ReflectionClass;
+use ReflectionParameter;
 
 trait FromToNativeTrait
 {
     /** @psalm-suppress MissingParamType */
     public static function fromNative($state): object
     {
-        if (!is_array($state)) {
-            throw new RuntimeException('This trait only works with array state.');
-        }
+        Assertion::isArray($state, 'This trait only works with array state.');
 
         $classReflection = new ReflectionClass(static::class);
         list($valueFactories, $product) = static::construct($classReflection, $state);
         foreach ($valueFactories as $propertyName => $factory) {
             if (array_key_exists($propertyName, $state)) {
                 $product->$propertyName = call_user_func($factory, $state[$propertyName]);
-            } elseif (is_callable($emptyFactory = [$factory[0], 'makeEmpty'])) {
-                $product->$propertyName = call_user_func($emptyFactory);
+            } elseif (is_a($factory[0], MakeEmptyInterface::class, true)) {
+                $product->$propertyName = call_user_func([$factory[0], 'makeEmpty']);
             }
         }
 
@@ -44,8 +43,8 @@ trait FromToNativeTrait
                 }
                 $property->setAccessible(true);
                 $value = $property->getValue($this);
-                if (is_callable($nativeFactory = [$value, 'toNative'])) {
-                    $state[$propertyName] = call_user_func($nativeFactory);
+                if (is_a($value, ToNativeInterface::class, true)) {
+                    $state[$propertyName] = call_user_func([$value, 'toNative']);
                 } else {
                     $state[$propertyName] = $value;
                 }
@@ -58,14 +57,15 @@ trait FromToNativeTrait
     private static function construct(ReflectionClass $classReflection, array $payload): array
     {
         $valueFactories = static::inferValueFactories($classReflection);
-        if (!$classReflection->hasMethod('__construct')) {
+        $constructor = $classReflection->getConstructor();
+        if (is_null($constructor) || $constructor->getNumberOfParameters() === 0) {
             /** @psalm-suppress TooFewArguments */
             return [$valueFactories, new static];
         }
 
         $constructorArgs = [];
-        $constructorParams = $classReflection->getMethod('__construct')->getParameters();
-        foreach ($constructorParams as $constructorParam) {
+        /** @var ReflectionParameter $constructorParam */
+        foreach ($constructor->getParameters() as $constructorParam) {
             $paramName = $constructorParam->getName();
             if (isset($payload[$paramName])) {
                 if (isset($valueFactories[$paramName])) {
@@ -77,19 +77,20 @@ trait FromToNativeTrait
             } elseif ($constructorParam->allowsNull()) {
                 $constructorArgs[] = null;
             } else {
-                throw new RuntimeException(
+                throw new InvalidArgumentException(
                     "Missing required value for key '$paramName' while constructing from native state."
                 );
             }
         }
 
         /** @psalm-suppress TooManyArguments */
-        return [$valueFactories, /** @scrutinizer ignore-call */ new static(...$constructorArgs)];
+        return [$valueFactories, new static(...$constructorArgs)];
     }
 
     private static function inferValueFactories(ReflectionClass $classReflection): array
     {
         $valueFactories = [];
+        /** @var ReflectionClass $currentClass */
         foreach (static::getInheritanceTree($classReflection, true) as $currentClass) {
             if (!($docComment = $currentClass->getDocComment())) {
                 continue;
@@ -98,9 +99,10 @@ trait FromToNativeTrait
             //@todo don't allow duplicate id/rev
             foreach ($matches[2] as $index => $propertyName) {
                 $callable = array_map('trim', explode('::', $matches[3][$index]));
-                if (!is_callable($callable)) {
-                    throw new RuntimeException("Value factory '$callable[0]' is not callable in ".static::class);
-                }
+                Assertion::isCallable(
+                    $callable,
+                    sprintf("Value factory '%s' is not callable in '%s'.", implode('::', $callable), static::class)
+                );
                 $valueFactories[$propertyName] = $callable;
             }
         }
