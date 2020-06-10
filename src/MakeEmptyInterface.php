@@ -11,4 +11,6 @@ namespace Daikon\Interop;
 interface MakeEmptyInterface
 {
     public static function makeEmpty(): object;
+
+    public function isEmpty(): bool;
 }
