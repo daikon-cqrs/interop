@@ -24,6 +24,11 @@ final class MockValue implements FromNativeInterface, ToNativeInterface, MakeEmp
         return new self;
     }
 
+    public function isEmpty(): bool
+    {
+        return !isset($this->value);
+    }
+
     public static function customFactory(array $state): self
     {
         return new self($state['custom']);

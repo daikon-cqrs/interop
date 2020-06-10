@@ -21,7 +21,7 @@ class FromToNativeTest extends TestCase
         $mock = MockValue::makeEmpty();
         $this->assertNull($mock->getValue());
 
-        $mock = AnnotatedValue::makeEmpty();
+        $mock = new AnnotatedValue;
         $this->assertInstanceOf(MockValue::class, $mock->getMockValue());
         $this->assertNull($mock->getMockValue()->getValue());
     }

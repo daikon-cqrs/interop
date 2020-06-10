@@ -17,18 +17,13 @@ use Daikon\Interop\ToNativeInterface;
  * @map(mockValue, Daikon\Tests\Interop\Fixture\MockValue::fromNative)
  * @map(otherMockValue, Daikon\Tests\Interop\Fixture\MockValue::customFactory)
  */
-final class AnnotatedValue implements FromNativeInterface, ToNativeInterface, MakeEmptyInterface
+final class AnnotatedValue implements FromNativeInterface, ToNativeInterface
 {
     use FromToNativeTrait;
 
     private ?MockValue $mockValue;
 
     private MockValue $otherMockValue;
-
-    public static function makeEmpty(): self
-    {
-        return new self;
-    }
 
     public function getMockValue(): MockValue
     {
