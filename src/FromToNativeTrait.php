@@ -22,9 +22,9 @@ trait FromToNativeTrait
         list($valueFactories, $product) = static::construct($classReflection, $state);
         foreach ($valueFactories as $propertyName => $factory) {
             if (array_key_exists($propertyName, $state)) {
-                $product->$propertyName = call_user_func($factory, $state[$propertyName]);
+                $product->$propertyName = $factory($state[$propertyName]);
             } elseif (is_a($factory[0], MakeEmptyInterface::class, true)) {
-                $product->$propertyName = call_user_func([$factory[0], 'makeEmpty']);
+                $product->$propertyName = ($factory[0].'::makeEmpty')();
             }
         }
 
@@ -43,8 +43,8 @@ trait FromToNativeTrait
                 }
                 $property->setAccessible(true);
                 $value = $property->getValue($this);
-                if (is_a($value, ToNativeInterface::class, true)) {
-                    $state[$propertyName] = call_user_func([$value, 'toNative']);
+                if (is_a($value, ToNativeInterface::class)) {
+                    $state[$propertyName] = $value->toNative();
                 } else {
                     $state[$propertyName] = $value;
                 }
@@ -69,7 +69,7 @@ trait FromToNativeTrait
             $paramName = $constructorParam->getName();
             if (isset($payload[$paramName])) {
                 if (isset($valueFactories[$paramName])) {
-                    $constructorArgs[] = call_user_func($valueFactories[$paramName], $payload[$paramName]);
+                    $constructorArgs[] = $valueFactories[$paramName]($payload[$paramName]);
                     unset($valueFactories[$paramName]);
                 } else {
                     $constructorArgs[] = $payload[$paramName];
