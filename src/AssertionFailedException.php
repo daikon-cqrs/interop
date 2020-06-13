@@ -8,6 +8,8 @@
 
 namespace Daikon\Interop;
 
-class AssertionFailedException extends InvalidArgumentException
+use Assert\AssertionFailedException as BaseAssertionFailedException;
+
+interface AssertionFailedException extends BaseAssertionFailedException, DaikonException
 {
 }

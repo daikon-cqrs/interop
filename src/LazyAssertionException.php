@@ -8,6 +8,8 @@
 
 namespace Daikon\Interop;
 
-class LazyAssertionException extends AssertionFailedException
+use Assert\LazyAssertionException as BaseLazyAssertionException;
+
+class LazyAssertionException extends BaseLazyAssertionException implements AssertionFailedException
 {
 }

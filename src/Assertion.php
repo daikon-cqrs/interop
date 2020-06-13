@@ -12,5 +12,5 @@ use Assert\Assertion as BaseAssertion;
 
 class Assertion extends BaseAssertion
 {
-    protected static $exceptionClass = AssertionFailedException::class;
+    protected static $exceptionClass = InvalidArgumentException::class;
 }

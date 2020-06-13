@@ -10,7 +10,7 @@ namespace Daikon\Interop;
 
 use Assert\InvalidArgumentException as BaseInvalidArgumentException;
 
-class InvalidArgumentException extends BaseInvalidArgumentException implements DaikonException
+class InvalidArgumentException extends BaseInvalidArgumentException implements AssertionFailedException
 {
     /** @param mixed $value */
     public function __construct(

@@ -15,4 +15,13 @@ class Assert extends BaseAssert
     protected static $lazyAssertionExceptionClass = LazyAssertionException::class;
 
     protected static $assertionClass = Assertion::class;
+
+    public static function lazy(): LazyAssertion
+    {
+        $lazyAssertion = new LazyAssertion;
+
+        return $lazyAssertion
+            ->setAssertClass(static::class)
+            ->setExceptionClass(static::$lazyAssertionExceptionClass);
+    }
 }
