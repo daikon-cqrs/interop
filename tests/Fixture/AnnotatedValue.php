@@ -10,12 +10,12 @@ namespace Daikon\Tests\Interop\Fixture;
 
 use Daikon\Interop\FromNativeInterface;
 use Daikon\Interop\FromToNativeTrait;
-use Daikon\Interop\MakeEmptyInterface;
 use Daikon\Interop\ToNativeInterface;
 
 /**
  * @map(mockValue, Daikon\Tests\Interop\Fixture\MockValue::fromNative)
  * @map(otherMockValue, Daikon\Tests\Interop\Fixture\MockValue::customFactory)
+ * @map(defaultFactoryMockValue, Daikon\Tests\Interop\Fixture\MockValue)
  */
 final class AnnotatedValue implements FromNativeInterface, ToNativeInterface
 {
@@ -25,6 +25,8 @@ final class AnnotatedValue implements FromNativeInterface, ToNativeInterface
 
     private MockValue $otherMockValue;
 
+    private MockValue $defaultFactoryMockValue;
+
     public function getMockValue(): MockValue
     {
         return $this->mockValue ?? MockValue::makeEmpty();
@@ -33,5 +35,10 @@ final class AnnotatedValue implements FromNativeInterface, ToNativeInterface
     public function getOtherMockValue(): MockValue
     {
         return $this->otherMockValue;
+    }
+
+    public function getDefaultFactoryMockValue(): MockValue
+    {
+        return $this->defaultFactoryMockValue;
     }
 }

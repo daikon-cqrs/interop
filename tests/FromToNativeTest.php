@@ -114,8 +114,12 @@ class FromToNativeTest extends TestCase
         $mock = AnnotatedValue::fromNative(['mockValue' => ['value' => '123']]);
         $this->assertEquals('123', $mock->getMockValue()->getValue());
 
-        $mock = AnnotatedValue::fromNative(['otherMockValue' => ['custom' => 'ABC']]);
+        $mock = AnnotatedValue::fromNative([
+            'otherMockValue' => ['custom' => 'ABC'],
+            'defaultFactoryMockValue' => ['value' => 'XYZ']
+        ]);
         $this->assertEquals('ABC', $mock->getOtherMockValue()->getValue());
+        $this->assertEquals('XYZ', $mock->getDefaultFactoryMockValue()->getValue());
 
         $this->expectException(TypeError::class);
         AnnotatedValue::fromNative(['otherMockValue' => 'ABC']);

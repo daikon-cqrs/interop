@@ -24,7 +24,7 @@ trait FromToNativeTrait
             if (array_key_exists($propertyName, $state)) {
                 $product->$propertyName = $factory($state[$propertyName]);
             } elseif (is_a($factory[0], MakeEmptyInterface::class, true)) {
-                $product->$propertyName = ($factory[0].'::makeEmpty')();
+                $product->$propertyName = ([$factory[0], 'makeEmpty'])();
             }
         }
 
@@ -99,6 +99,9 @@ trait FromToNativeTrait
             //@todo don't allow duplicate id/rev
             foreach ($matches[2] as $index => $propertyName) {
                 $callable = array_map('trim', explode('::', $matches[3][$index]));
+                if (count($callable) === 1 && is_a($callable[0], FromNativeInterface::class, true)) {
+                    $callable[1] = 'fromNative';
+                }
                 Assertion::isCallable(
                     $callable,
                     sprintf("Value factory '%s' is not callable in '%s'.", implode('::', $callable), static::class)
