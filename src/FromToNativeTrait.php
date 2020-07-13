@@ -15,8 +15,8 @@ trait FromToNativeTrait
 {
     use InheritanceReader;
 
-    /** @psalm-suppress MissingParamType */
-    public static function fromNative($state): object
+    /** @return static */
+    public static function fromNative($state): self
     {
         Assertion::isArray($state, 'This trait only works with array state.');
 
