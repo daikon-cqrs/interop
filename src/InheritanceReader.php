@@ -12,7 +12,7 @@ use ReflectionClass;
 
 trait InheritanceReader
 {
-    private static function getInheritance(ReflectionClass $classReflection, bool $includeTraits = false): array
+    protected static function getInheritance(ReflectionClass $classReflection, bool $includeTraits = false): array
     {
         $parent = $classReflection;
         $classes = $includeTraits
