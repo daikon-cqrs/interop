@@ -10,7 +10,6 @@ namespace Daikon\Interop;
 
 interface MakeEmptyInterface
 {
-    /** @return static */
     public static function makeEmpty(): self;
 
     public function isEmpty(): bool;
