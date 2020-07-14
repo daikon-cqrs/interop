@@ -12,7 +12,7 @@ use ReflectionClass;
 
 trait FromToNativeTrait
 {
-    use InheritanceReader;
+    use SupportsAnnotations;
 
     /**
      * @psalm-suppress MissingParamType
@@ -22,8 +22,7 @@ trait FromToNativeTrait
     {
         Assertion::isArray($state, 'This trait only works with array state.');
 
-        $classReflection = new ReflectionClass(static::class);
-        list($valueFactories, $product) = static::construct($classReflection, $state);
+        list($valueFactories, $product) = static::construct($state);
         foreach ($valueFactories as $propertyName => $factory) {
             if (array_key_exists($propertyName, $state)) {
                 $product->$propertyName = $factory($state[$propertyName]);
@@ -38,12 +37,12 @@ trait FromToNativeTrait
     public function toNative(): array
     {
         $state = [];
-        $classReflection = new ReflectionClass($this);
-        foreach (static::getInheritance($classReflection) as $currentClass) {
+        $reflectionClass = new ReflectionClass($this);
+        foreach (static::getInheritance() as $currentClass) {
             foreach ($currentClass->getProperties() as $property) {
                 $propertyName = $property->getName();
                 if ($currentClass->isTrait()) {
-                    $property = $classReflection->getProperty($propertyName);
+                    $property = $reflectionClass->getProperty($propertyName);
                 }
                 $property->setAccessible(true);
                 $value = $property->getValue($this);
@@ -58,10 +57,10 @@ trait FromToNativeTrait
         return $state;
     }
 
-    private static function construct(ReflectionClass $classReflection, array $payload): array
+    private static function construct(array $payload): array
     {
-        $valueFactories = static::inferValueFactories($classReflection);
-        $constructor = $classReflection->getConstructor();
+        $valueFactories = static::inferValueFactories();
+        $constructor = (new ReflectionClass(static::class))->getConstructor();
         if (is_null($constructor) || $constructor->getNumberOfParameters() === 0) {
             /** @psalm-suppress TooFewArguments */
             return [$valueFactories, new static];
@@ -88,30 +87,5 @@ trait FromToNativeTrait
 
         /** @psalm-suppress TooManyArguments */
         return [$valueFactories, new static(...$constructorArgs)];
-    }
-
-    private static function inferValueFactories(ReflectionClass $classReflection): array
-    {
-        $valueFactories = [];
-        foreach (static::getInheritance($classReflection) as $currentClass) {
-            if (!($docComment = $currentClass->getDocComment())) {
-                continue;
-            }
-            preg_match_all('/@(?:id|rev|map)\(((.+),(.+))\)/', $docComment, $matches);
-            //@todo don't allow duplicate id/rev
-            foreach ($matches[2] as $index => $propertyName) {
-                $callable = array_map('trim', explode('::', $matches[3][$index]));
-                if (!isset($callable[1]) && is_a($callable[0], FromNativeInterface::class, true)) {
-                    $callable[1] = 'fromNative';
-                }
-                Assertion::isCallable(
-                    $callable,
-                    sprintf("Value factory '%s' is not callable in '%s'.", implode('::', $callable), static::class)
-                );
-                $valueFactories[$propertyName] = $callable;
-            }
-        }
-
-        return $valueFactories;
     }
 }
