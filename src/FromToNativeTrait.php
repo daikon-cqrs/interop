@@ -9,7 +9,6 @@
 namespace Daikon\Interop;
 
 use ReflectionClass;
-use ReflectionParameter;
 
 trait FromToNativeTrait
 {
@@ -40,7 +39,7 @@ trait FromToNativeTrait
     {
         $state = [];
         $classReflection = new ReflectionClass($this);
-        foreach (static::getInheritance($classReflection, true) as $currentClass) {
+        foreach (static::getInheritance($classReflection) as $currentClass) {
             foreach ($currentClass->getProperties() as $property) {
                 $propertyName = $property->getName();
                 if ($currentClass->isTrait()) {
@@ -69,7 +68,6 @@ trait FromToNativeTrait
         }
 
         $constructorArgs = [];
-        /** @var ReflectionParameter $constructorParam */
         foreach ($constructor->getParameters() as $constructorParam) {
             $paramName = $constructorParam->getName();
             if (isset($payload[$paramName])) {
@@ -95,8 +93,7 @@ trait FromToNativeTrait
     private static function inferValueFactories(ReflectionClass $classReflection): array
     {
         $valueFactories = [];
-        /** @var ReflectionClass $currentClass */
-        foreach (static::getInheritance($classReflection, true) as $currentClass) {
+        foreach (static::getInheritance($classReflection) as $currentClass) {
             if (!($docComment = $currentClass->getDocComment())) {
                 continue;
             }

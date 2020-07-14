@@ -12,22 +12,24 @@ use ReflectionClass;
 
 trait InheritanceReader
 {
-    protected static function getInheritance(ReflectionClass $classReflection, bool $includeTraits = false): array
+    /** @return ReflectionClass[] */
+    protected static function getInheritance(ReflectionClass $classReflection, bool $includeTraits = true): array
     {
-        $parent = $classReflection;
+        $current = $classReflection;
         $classes = $includeTraits
             ? array_merge([$classReflection], static::flatMapTraits($classReflection))
             : [$classReflection];
 
-        while ($parent = $parent->getParentClass()) {
+        while ($current = $current->getParentClass()) {
             $classes = $includeTraits
-                ? array_merge($classes, [$parent], static::flatMapTraits($parent))
+                ? array_merge($classes, [$current], static::flatMapTraits($current))
                 : array_merge($classes, [$classReflection]);
         }
 
         return $classes;
     }
 
+    /** @return ReflectionClass[] */
     private static function flatMapTraits(ReflectionClass $classReflection): array
     {
         $traits = [];
