@@ -10,6 +10,9 @@ namespace Daikon\Interop;
 
 interface FromNativeInterface
 {
-    /** @return static */
+    /**
+     * @psalm-suppress MissingParamType
+     * @return static
+     */
     public static function fromNative($state): self;
 }
