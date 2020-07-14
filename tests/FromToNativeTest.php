@@ -8,7 +8,7 @@
 
 namespace Daikon\Tests\Interop;
 
-use Daikon\Interop\AssertionFailedException;
+use Daikon\Interop\InvalidArgumentException;
 use Daikon\Tests\Interop\Fixture\AnnotatedValue;
 use Daikon\Tests\Interop\Fixture\MockValue;
 use PHPUnit\Framework\TestCase;
@@ -28,28 +28,28 @@ class FromToNativeTest extends TestCase
 
     public function testFromNativeWithNull(): void
     {
-        $this->expectException(AssertionFailedException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('This trait only works with array state.');
         MockValue::fromNative(null);
     }
 
     public function testInferredFromNativeWithNull(): void
     {
-        $this->expectException(AssertionFailedException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('This trait only works with array state.');
         AnnotatedValue::fromNative(null);
     }
 
     public function testFromNativeWithScalar(): void
     {
-        $this->expectException(AssertionFailedException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('This trait only works with array state.');
         MockValue::fromNative('test');
     }
 
     public function testInferredFromNativeWithScalar(): void
     {
-        $this->expectException(AssertionFailedException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('This trait only works with array state.');
         AnnotatedValue::fromNative('test');
     }
@@ -75,14 +75,14 @@ class FromToNativeTest extends TestCase
 
     public function testInferredFromNativeWithInvalidType(): void
     {
-        $this->expectException(AssertionFailedException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('This trait only works with array state.');
         AnnotatedValue::fromNative(['mockValue' => 123]);
     }
 
     public function testInferredFromNativeWithNullValueState(): void
     {
-        $this->expectException(AssertionFailedException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('This trait only works with array state.');
         AnnotatedValue::fromNative(['mockValue' => null]);
     }
