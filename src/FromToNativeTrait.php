@@ -100,11 +100,11 @@ trait FromToNativeTrait
             if (!($docComment = $currentClass->getDocComment())) {
                 continue;
             }
-            preg_match_all('#@(?:id|rev|map)\(((.+),(.+))\)#', $docComment, $matches);
+            preg_match_all('/@(?:id|rev|map)\(((.+),(.+))\)/', $docComment, $matches);
             //@todo don't allow duplicate id/rev
             foreach ($matches[2] as $index => $propertyName) {
                 $callable = array_map('trim', explode('::', $matches[3][$index]));
-                if (count($callable) === 1 && is_a($callable[0], FromNativeInterface::class, true)) {
+                if (!isset($callable[1]) && is_a($callable[0], FromNativeInterface::class, true)) {
                     $callable[1] = 'fromNative';
                 }
                 Assertion::isCallable(
