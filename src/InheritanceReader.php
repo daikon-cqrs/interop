@@ -33,8 +33,7 @@ trait InheritanceReader
     private static function flatMapTraits(ReflectionClass $classReflection): array
     {
         $traits = [];
-        $currentTrait = $classReflection;
-        foreach ($currentTrait->getTraits() as $trait) {
+        foreach ($classReflection->getTraits() as $trait) {
             $traits = array_merge($traits, [$trait], static::flatMapTraits($trait));
         }
 
