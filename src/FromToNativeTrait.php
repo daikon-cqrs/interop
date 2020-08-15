@@ -62,7 +62,7 @@ trait FromToNativeTrait
         $valueFactories = static::inferValueFactories();
         $constructor = (new ReflectionClass(static::class))->getConstructor();
         if (is_null($constructor) || $constructor->getNumberOfParameters() === 0) {
-            /** @psalm-suppress TooFewArguments */
+            /** @psalm-suppress UnsafeInstantiation */
             return [$valueFactories, new static];
         }
 
@@ -85,7 +85,7 @@ trait FromToNativeTrait
             }
         }
 
-        /** @psalm-suppress TooManyArguments */
+        /** @psalm-suppress UnsafeInstantiation */
         return [$valueFactories, new static(...$constructorArgs)];
     }
 }
