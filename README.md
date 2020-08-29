@@ -2,7 +2,6 @@
 
 ![PHP Version Support](https://badgen.net/packagist/php/daikon/interop?color=blue)
 [![Lines of Code](https://badgen.net/codeclimate/loc/daikon-cqrs/interop)](https://codeclimate.com/github/daikon-cqrs/interop/code?sort=-loc)
-[![Dependencies](https://badgen.net/github/dependents-pkg/daikon-cqrs/interop?label=dependencies)](https://github.com/daikon-cqrs/interop/network/dependencies)
 [![Packagist](https://badgen.net/packagist/name/daikon/interop?color=blue)](https://packagist.org/packages/daikon/interop)
 [![License](https://badgen.net/github/license/daikon-cqrs/interop)](https://github.com/daikon-cqrs/interop/blob/master/LICENSE)
 
@@ -11,5 +10,6 @@
 [![Type Coverage](https://shepherd.dev/github/daikon-cqrs/interop/coverage.svg)](https://shepherd.dev/github/daikon-cqrs/interop)
 [![Code Quality](https://img.shields.io/scrutinizer/quality/g/daikon-cqrs/interop/master)](https://scrutinizer-ci.com/g/daikon-cqrs/interop/?branch=master)
 [![Code Maintainability](https://badgen.net/codeclimate/maintainability/daikon-cqrs/interop)](https://codeclimate.com/github/daikon-cqrs/interop)
+[![Dependabot](https://badgen.net/github/dependabot/daikon-cqrs/interop)](https://github.com/daikon-cqrs/interop/network/updates)
 
 Interoperability code used across Daikon-CQRS components.
