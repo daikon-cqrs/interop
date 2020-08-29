@@ -85,7 +85,10 @@ trait FromToNativeTrait
             }
         }
 
-        /** @psalm-suppress UnsafeInstantiation */
+        /**
+         * @psalm-suppress UnsafeInstantiation
+         * @psalm-suppress TooManyArguments
+         */
         return [$valueFactories, new static(...$constructorArgs)];
     }
 }
