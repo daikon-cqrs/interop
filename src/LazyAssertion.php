@@ -97,7 +97,7 @@ class LazyAssertion extends BaseLazyAssertion
     }
 
     /** @return static */
-    public function setAssertClass(string $className)
+    public function setAssertClass(string $className): LazyAssertion
     {
         if (Assert::class !== $className && !is_subclass_of($className, Assert::class)) {
             throw new LogicException($className.' is not (a subclass of) '.Assert::class);
@@ -109,7 +109,7 @@ class LazyAssertion extends BaseLazyAssertion
     }
 
     /** @return static */
-    public function setExceptionClass(string $className)
+    public function setExceptionClass(string $className): LazyAssertion
     {
         if (LazyAssertionException::class !== $className
             && !is_subclass_of($className, LazyAssertionException::class)
